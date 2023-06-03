@@ -5,8 +5,8 @@ from tlush_parser import PayslipsParser
 
 def main(payslips_directory_path):
     payslips_parser = PayslipsParser(payslips_directory_path)
-    parsed_payslips = payslips_parser.parse_payslips()
-    print(parsed_payslips)
+    blocks_payslips, df = payslips_parser.parse_payslips()
+    df.to_csv('try.csv')
 
 
 if __name__ == '__main__':

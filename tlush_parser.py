@@ -2,21 +2,31 @@ import os
 import re
 
 import fitz
+import pandas as pd
+
+RAW_DATA = 'raw_data'
+MONTHLY_PAYMENTS = 'monthly_payments'
+MONTHLY_REDUCTIONS = 'monthly_reductions'
+NET_MONTHLY_PAYMENT = 'net_monthly_payment'
+PAYMENTS_DIFFERENCES = 'payments_differences'
+REDUCTIONS_DIFFERENCES = 'reductions_differences'
+NET_DIFFERENCES = 'net_differences'
+TOTAL_TRANSFER_TO_BANK = 'total_transfer_to_bank'
 
 
 class PayslipsParser:
     regions = {
-        'raw_data': {'x0': 150, 'x1': 430, 'y0': 140, 'y1': 250},
+        RAW_DATA: {'x0': 150, 'x1': 430, 'y0': 140, 'y1': 250},
 
-        'monthly_payments': {'x0': 220, 'x1': 430, 'y0': 280, 'y1': 390},
-        'monthly_reductions': {'x0': 10, 'x1': 220, 'y0': 280, 'y1': 390},
-        'net_monthly_payment': {'x0': 10, 'x1': 60, 'y0': 385, 'y1': 410},
+        MONTHLY_PAYMENTS: {'x0': 220, 'x1': 430, 'y0': 280, 'y1': 390},
+        MONTHLY_REDUCTIONS: {'x0': 10, 'x1': 220, 'y0': 280, 'y1': 390},
+        NET_MONTHLY_PAYMENT: {'x0': 10, 'x1': 60, 'y0': 385, 'y1': 410},
 
-        'payments_differences': {'x0': 220, 'x1': 430, 'y0': 420, 'y1': 535},
-        'reductions_differences': {'x0': 10, 'x1': 220, 'y0': 420, 'y1': 535},
-        'net_differences': {'x0': 10, 'x1': 60, 'y0': 530, 'y1': 555},
+        PAYMENTS_DIFFERENCES: {'x0': 220, 'x1': 430, 'y0': 420, 'y1': 535},
+        REDUCTIONS_DIFFERENCES: {'x0': 10, 'x1': 220, 'y0': 420, 'y1': 535},
+        NET_DIFFERENCES: {'x0': 10, 'x1': 60, 'y0': 530, 'y1': 555},
 
-        'total_transfer_to_bank': {'x0': 10, 'x1': 70, 'y0': 695, 'y1': 715},
+        TOTAL_TRANSFER_TO_BANK: {'x0': 10, 'x1': 70, 'y0': 695, 'y1': 715},
     }
     re_six_digit_date = '(?P<DD>[0-9]{2})(?P<MM>[0-9]{2})(?P<YY>[0-9]{2})'
     re_payment_amount = '(?P<shekels>[0-9]{1,5}).(?P<agorot>[0-9]{2})'
@@ -32,7 +42,7 @@ class PayslipsParser:
     def _get_payslip_name_from_path(payslip_path):
         filename = payslip_path.split('/')[-1].split('.')[0]
         month = filename[8:-5] if len(filename[8:-5]) == 2 else '0' + filename[8:-5]  # add leading zero to month
-        payslip_name = filename[:7] + '_' + filename[-5:-1] + '-' + month
+        payslip_name = filename[:7] + '__' + filename[-5:-1] + '-' + month
         return payslip_name
 
     @staticmethod
@@ -68,26 +78,39 @@ class PayslipsParser:
                 return region_name
         # raise RuntimeError(f'Region not found for block no. {block["block_no"]}')
 
-    def _parse_payslip(self, payslip_path: str):
+    def _payslip_to_blocks(self, payslip_path: str):
         payslip_name = self._get_payslip_name_from_path(payslip_path)
         pdf_blocks = self._load_pdf_to_memory(payslip_path)
-        for block in pdf_blocks:
-            block['text'] = self._separate_alphas_from_numbers(block['text'], reverse_text=True)
-            block['region'] = self._get_block_region(block)
         header, body = self._chunkify_pdf(pdf_blocks)
+        for block in body:
+            block['text'] = self._process_block_text(block['text'], reverse_alphas=True)
+            block['region'] = self._get_block_region(block)
 
-        header = self._parse_blocks(header, filter_rows_without_underscore=False)
-        body = self._parse_blocks(body, filter_rows_without_underscore=True)
+        d = {'payslip_name': payslip_name}
+        d.update(self._parse_header_blocks(header))
+        d['body'] = self._parse_body_blocks(body, filter_rows_without_underscore=True)
 
-        return {
-            'payslip_name': payslip_name,
-            'header': header,
-            'body': body,
-        }
+        return d
 
-    def parse_payslips(self) -> dict:
-        parsed_payslips = [self._parse_payslip(ps) for ps in self.payslips_paths]
-        return {ps.pop('payslip_name'): ps for ps in parsed_payslips}
+    def parse_payslips(self):
+        parsed_payslips = {}
+
+        for payslip_path in self.payslips_paths:
+            payslip_blocks = self._payslip_to_blocks(payslip_path)
+            payslip_blocks['payslip_path'] = payslip_path
+            parsed_payslips[payslip_blocks.pop('payslip_name')] = payslip_blocks
+
+        idx, records = 0, {}
+        for payslip in parsed_payslips.values():
+            for block in payslip['body']:
+                record = self._block_to_record(block)
+                if record:
+                    record['תאריך תלוש'] = payslip['payslip_date']
+                    records[idx] = record
+                    idx += 1
+        df = pd.DataFrame.from_dict(records, orient='index')
+
+        return parsed_payslips, df
 
     def _separate_date_from_money(self, expression: str) -> str:
         m = re.match(self.re_differences, expression)
@@ -107,7 +130,7 @@ class PayslipsParser:
         else:
             return expression
 
-    def _parse_blocks(self, pdf_blocks, filter_rows_without_underscore=True):
+    def _parse_body_blocks(self, pdf_blocks, filter_rows_without_underscore=False):
         if filter_rows_without_underscore:
             pdf_blocks = [block for block in pdf_blocks
                           if '_' in block['text']['alphas'] or block['text']['alphas'] == '']
@@ -119,7 +142,7 @@ class PayslipsParser:
         return pdf_blocks
 
     @staticmethod
-    def _separate_alphas_from_numbers(text, reverse_text=True):
+    def _process_block_text(text, reverse_alphas=True):
         text = text.strip('\n').replace('\xa0', ' ')
 
         alphas = ''
@@ -130,6 +153,71 @@ class PayslipsParser:
             elif char == '.' and text[idx - 1].isnumeric() and text[idx + 1].isnumeric():
                 numbers += char
             else:
-                alphas = char + alphas if reverse_text else alphas + char
+                alphas = char + alphas if reverse_alphas else alphas + char
 
         return {'alphas': alphas, 'numbers': numbers}
+
+    def _block_to_record(self, block):
+        d = {}
+        region = block['region']
+        alphas = block['text']['alphas']
+        numbers = block['text']['numbers']
+
+        if alphas == '':  # no point to add empty line with total region sum
+            return None
+
+        if region == RAW_DATA:  # נתונים גולמיים
+            d['שם הנתון'] = alphas
+            d['ערך הנתון'] = alphas  # TODO
+            d['ת. תחילה'] = numbers
+
+        if region == MONTHLY_PAYMENTS:  # תשלומים שוטפים
+            d['שם התשלום'] = alphas
+            d['סכום קודם (תשלומים שוטפים)'] = None  # TODO
+            d['סכום נוכחי (תשלומים שוטפים)'] = numbers
+
+        if region == MONTHLY_REDUCTIONS:  # ניכויים שוטפים
+            d['שם הניכוי'] = alphas
+            d['סכום קודם (ניכויים שוטפים)'] = None  # TODO
+            d['סכום נוכחי (ניכויים שוטפים)'] = numbers
+
+        if region == PAYMENTS_DIFFERENCES:  # הפרשי תשלומים
+            d['שם התשלום'] = alphas
+            d['תשלום מתאריך'] = numbers.split('__')[2]
+            d['תשלום עד תאריך'] = numbers.split('__')[1]
+            d['סכום (הפרשי תשלומים)'] = numbers.split('__')[0]
+
+        if region == REDUCTIONS_DIFFERENCES:  # הפרשי ניכויים
+            d['שם הניכוי'] = alphas
+            d['ניכוי מתאריך'] = numbers.split('__')[2]
+            d['ניכוי עד תאריך'] = numbers.split('__')[1]
+            d['סכום (הפרשי ניכויים)'] = numbers.split('__')[0]
+
+        return d
+
+    @staticmethod
+    def _parse_header_date(text):
+        return text.strip('\n').replace(' ', '').replace('/', '-')
+
+    def _parse_header_blocks(self, header):
+        d = {}
+
+        for block in header:
+            if block['block_no'] != 3:
+                block['text'] = self._process_block_text(block['text'])
+
+        # 0th block in header always starts with מ.א., we can drop that
+        d['worker_name'] = header[0]['text']['alphas'][4:]
+        d['sub_unit'] = header[1]['text']['numbers']
+        d['יחתש'] = header[2]['text']['numbers']
+        d['payslip_date'] = self._parse_header_date(header[3]['text'])
+        d['idf_personal_number'] = header[4]['text']['numbers']
+        d['national_id'] = header[5]['text']['numbers']
+        d['bank_details'] = {
+            'bank_name': header[6]['text']['alphas'],
+            'branch_code': header[6]['text']['numbers'],
+            'branch_name': header[7]['text']['alphas'],
+            'account_no': header[7]['text']['numbers']
+        }
+
+        return d
