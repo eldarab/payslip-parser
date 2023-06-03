@@ -7,7 +7,7 @@ import fitz
 
 class PayslipsParser:
     re_six_digit_date = '(?P<DD>[0-9]{2})(?P<MM>[0-9]{2})(?P<YY>[0-9]{2})'
-    re_payment_amount = '(?P<shekels>[0-9]{1-5}).(?P<agorot>[0-9]{2})'
+    re_payment_amount = '(?P<shekels>[0-9]{1,5}).(?P<agorot>[0-9]{2})'
     re_differences = '(?P<from_DD>[0-9]{2})(?P<from_MM>[0-9]{2})(?P<from_YY>[0-9]{2})' \
                      '(?P<to_DD>[0-9]{2})(?P<to_MM>[0-9]{2})(?P<to_YY>[0-9]{2})' + re_payment_amount
 
@@ -18,12 +18,12 @@ class PayslipsParser:
 
     @staticmethod
     def _get_payslip_name_from_path(payslip_path):
-        # TODO should work with pathlib
         filename = payslip_path.split('/')[-1].split('.')[0]
         month = filename[8:-5] if len(filename[8:-5]) == 2 else '0' + filename[8:-5]  # add leading zero to month
         payslip_name = filename[:7] + '_' + filename[-5:-1] + '-' + month
         return payslip_name
 
+    # noinspection PyUnresolvedReferences
     def _load_pdf_to_memory(self, payslip_path, reverse_text=True):
         with fitz.open(payslip_path) as pdf:
             text = chr(12).join([page.get_text() for page in pdf])
@@ -84,7 +84,7 @@ class PayslipsParser:
     def _dash_six_digit_dates(self, expression: str) -> str:
         """Adds dashes between six digit dates. DDMMYY -> DD-MM-YY"""
         m = re.match(self.re_six_digit_date, expression)
-        if m:
+        if len(expression) == 6 and m:
             return f'{m.group("DD")}-{m.group("MM")}-{m.group("YY")}'
         else:
             return expression
