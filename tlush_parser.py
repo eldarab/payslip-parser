@@ -1,6 +1,5 @@
 import os
 import re
-from typing import List
 
 import fitz
 
@@ -23,29 +22,24 @@ class PayslipsParser:
         payslip_name = filename[:7] + '_' + filename[-5:-1] + '-' + month
         return payslip_name
 
-    # noinspection PyUnresolvedReferences
-    def _load_pdf_to_memory(self, payslip_path, reverse_text=True):
-        with fitz.open(payslip_path) as pdf:
-            text = chr(12).join([page.get_text() for page in pdf])
-            text_rows = [row.replace('\xa0', ' ') for row in text.split('\n')]
-            text_num_rows = [self._text_number_split(row, reverse_text=reverse_text) for row in text_rows]
-        return text_num_rows
-
     @staticmethod
-    def _text_number_split(s, reverse_text=False):
-        """Gets a string and returns a tuple (texts, numbers) separating the text from the numbers"""
+    def _block_to_dict(block: tuple) -> dict:
+        return {
+            'x0': block[0],
+            'y0': block[1],
+            'x1': block[2],
+            'y1': block[3],
+            'text': block[4],
+            'block_no': block[5],
+            'block_type': block[6]
+        }
 
-        alphas = ''
-        numbers = ''
-        for idx, char in enumerate(s):
-            if char.isnumeric():
-                numbers += char
-            elif char == '.' and s[idx - 1].isnumeric() and s[idx + 1].isnumeric():
-                numbers += char
-            else:
-                alphas = char + alphas if reverse_text else alphas + char
-
-        return alphas, numbers
+    # noinspection PyUnresolvedReferences
+    def _load_pdf_to_memory(self, payslip_path):
+        with fitz.open(payslip_path) as pdf:
+            blocks = list(pdf.pages(0, 1))[0].get_textpage().extractBLOCKS()
+            blocks_dict = [self._block_to_dict(block) for block in blocks]
+        return blocks_dict
 
     @staticmethod
     def _chunkify_pdf(pdf_rows):
@@ -54,12 +48,13 @@ class PayslipsParser:
 
     def _parse_payslip(self, payslip_path: str):
         payslip_name = self._get_payslip_name_from_path(payslip_path)
-        pdf_rows: List[(str, str)] = self._load_pdf_to_memory(payslip_path)
-        header, body = self._chunkify_pdf(pdf_rows)
+        pdf_blocks = self._load_pdf_to_memory(payslip_path)
+        for block in pdf_blocks:
+            block['text'] = self._separate_alphas_from_numbers(block['text'], reverse_text=True)
+        header, body = self._chunkify_pdf(pdf_blocks)
 
-        body = self._parse_body(body)
-
-        print(payslip_name)
+        header = self._parse_blocks(header, filter_rows_without_underscore=False)
+        body = self._parse_blocks(body, filter_rows_without_underscore=True)
 
         return {
             'payslip_name': payslip_name,
@@ -89,11 +84,29 @@ class PayslipsParser:
         else:
             return expression
 
-    def _parse_body(self, rows, filter_rows_without_underscore=True):
+    def _parse_blocks(self, pdf_blocks, filter_rows_without_underscore=True):
         if filter_rows_without_underscore:
-            rows = [row for row in rows if '_' in row[0] or row[0] == '']
+            pdf_blocks = [block for block in pdf_blocks
+                          if '_' in block['text']['alphas'] or block['text']['alphas'] == '']
 
-        rows = [(row[0], self._separate_date_from_money(row[1])) for row in rows]
-        rows = [(row[0], self._dash_six_digit_dates(row[1])) for row in rows]
+        for block in pdf_blocks:
+            block['text']['numbers'] = self._separate_date_from_money(block['text']['numbers'])
+            block['text']['numbers'] = self._dash_six_digit_dates(block['text']['numbers'])
 
-        return rows
+        return pdf_blocks
+
+    @staticmethod
+    def _separate_alphas_from_numbers(text, reverse_text=True):
+        text = text.strip('\n').replace('\xa0', ' ')
+
+        alphas = ''
+        numbers = ''
+        for idx, char in enumerate(text):
+            if char.isnumeric():
+                numbers += char
+            elif char == '.' and text[idx - 1].isnumeric() and text[idx + 1].isnumeric():
+                numbers += char
+            else:
+                alphas = char + alphas if reverse_text else alphas + char
+
+        return {'alphas': alphas, 'numbers': numbers}
