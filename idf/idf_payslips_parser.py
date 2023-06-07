@@ -4,6 +4,9 @@ import re
 import fitz
 import pandas as pd
 
+from business_logic.payslip_parser import PayslipParser
+
+# TODO move to config
 RAW_DATA = 'raw_data'
 MONTHLY_PAYMENTS = 'monthly_payments'
 MONTHLY_REDUCTIONS = 'monthly_reductions'
@@ -14,7 +17,7 @@ NET_DIFFERENCES = 'net_differences'
 TOTAL_TRANSFER_TO_BANK = 'total_transfer_to_bank'
 
 
-class PayslipsParser:
+class IDFPayslipsParser(PayslipParser):
     regions = {
         RAW_DATA: {'x0': 150, 'x1': 430, 'y0': 140, 'y1': 250},
 
@@ -80,15 +83,15 @@ class PayslipsParser:
 
     def _payslip_to_blocks(self, payslip_path: str):
         payslip_name = self._get_payslip_name_from_path(payslip_path)
-        pdf_blocks = self._load_pdf_to_memory(payslip_path)
-        header, body = self._chunkify_pdf(pdf_blocks)
-        for block in body:
+        pdf_blocks = self._load_pdf_to_memory(payslip_path)  # TODO maybe do not reverse?
+        header_blocks, body_blocks = self._chunkify_pdf(pdf_blocks)
+        for block in body_blocks:
             block['text'] = self._process_block_text(block['text'], reverse_alphas=True)
             block['region'] = self._get_block_region(block)
 
         d = {'payslip_name': payslip_name}
-        d.update(self._parse_header_blocks(header))
-        d['body'] = self._parse_body_blocks(body, filter_rows_without_underscore=True)
+        d.update(self._header_blocks_to_dict(header_blocks))
+        d['body'] = self._parse_body_blocks(body_blocks, filter_rows_without_underscore=True)
 
         return d
 
@@ -109,6 +112,9 @@ class PayslipsParser:
                     records[idx] = record
                     idx += 1
         df = pd.DataFrame.from_dict(records, orient='index')
+
+        # TODO reorder columns
+        # TODO return Payslip object
 
         return parsed_payslips, df
 
@@ -157,7 +163,8 @@ class PayslipsParser:
 
         return {'alphas': alphas, 'numbers': numbers}
 
-    def _block_to_record(self, block):
+    @staticmethod
+    def _block_to_record(block):
         d = {}
         region = block['region']
         alphas = block['text']['alphas']
@@ -199,17 +206,16 @@ class PayslipsParser:
     def _parse_header_date(text):
         return text.strip('\n').replace(' ', '').replace('/', '-')
 
-    def _parse_header_blocks(self, header):
+    def _header_blocks_to_dict(self, header) -> dict:
         d = {}
 
         for block in header:
             if block['block_no'] != 3:
                 block['text'] = self._process_block_text(block['text'])
 
-        # 0th block in header always starts with מ.א., we can drop that
-        d['worker_name'] = header[0]['text']['alphas'][4:]
+        d['worker_name'] = header[0]['text']['alphas'][4:]  # 0th block in header always starts with מ.א.
         d['sub_unit'] = header[1]['text']['numbers']
-        d['יחתש'] = header[2]['text']['numbers']
+        d['יחתש'] = header[2]['text']['numbers']  # TODO what does this mean
         d['payslip_date'] = self._parse_header_date(header[3]['text'])
         d['idf_personal_number'] = header[4]['text']['numbers']
         d['national_id'] = header[5]['text']['numbers']
