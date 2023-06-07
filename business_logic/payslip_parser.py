@@ -1,6 +1,6 @@
 import abc
 from datetime import datetime
-from typing import Any
+from typing import Any, List
 
 import fitz
 from pandas import DataFrame
@@ -54,26 +54,26 @@ class PayslipParser(abc.ABC):
         )
 
     @abc.abstractmethod
-    def _get_payslip_name(self, payslip_path) -> str:
+    def _get_payslip_name(self, payslip_path: str) -> str:
         pass
 
     @abc.abstractmethod
-    def _get_worker_id(self, header_blocks) -> str:
+    def _get_worker_id(self, header_blocks: List[TextBlock]) -> str:
         pass
 
     @abc.abstractmethod
-    def _get_worker_name(self, header_blocks) -> str:
+    def _get_worker_name(self, header_blocks: List[TextBlock]) -> str:
         pass
 
     @abc.abstractmethod
-    def _get_payslip_date(self, header_blocks) -> datetime:
+    def _get_payslip_date(self, header_blocks: List[TextBlock]) -> datetime:
         pass
 
-    def _get_additional_metadata(self, header_blocks) -> Any:
+    def _get_additional_metadata(self, header_blocks: List[TextBlock]) -> Any:
         pass
 
     @abc.abstractmethod
-    def _get_payslip_records(self, body_blocks) -> DataFrame:
+    def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
         pass
 
     def _identify_region(self, region_bounds: RegionBounds) -> str:
