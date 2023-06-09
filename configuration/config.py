@@ -19,4 +19,4 @@ class Region(BaseModel):
 class PayslipsParserConfig(BaseModel):
     regions: List[Region]
     regular_expressions: Dict[str, AnyStr]
-    is_rtl_payslip: bool
+    rtl_payslip: bool
