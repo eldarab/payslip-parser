@@ -13,7 +13,7 @@ class RegionBounds(BaseModel):
 class Region(BaseModel):
     name: str
     is_header: bool
-    bounds = RegionBounds
+    bounds: RegionBounds
 
 
 class PayslipsParserConfig(BaseModel):
