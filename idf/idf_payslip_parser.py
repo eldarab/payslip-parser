@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Dict, Any
 
 from pandas import DataFrame
 
@@ -15,13 +15,26 @@ class IDFPayslipParser(PayslipParser):
         return payslip_name
 
     def _get_worker_id(self, header_blocks: List[TextBlock]) -> str:
-        pass
+        idf_personal_number_block = header_blocks[4]
+        assert idf_personal_number_block.region_name == 'personal_data'
+        return idf_personal_number_block.parsed_text['numbers']
 
     def _get_worker_name(self, header_blocks: List[TextBlock]) -> str:
-        pass
+        worker_name_block = header_blocks[0]
+        assert worker_name_block.region_name == 'to'
+        return worker_name_block.parsed_text['alphas'][4:]  # get rid of מ.א. prefix
 
     def _get_payslip_date(self, header_blocks: List[TextBlock]) -> datetime:
-        pass
+        payslip_date_block = header_blocks[3]
+        assert payslip_date_block.region_name == 'payslip_date'
+        return datetime(
+            year=int(payslip_date_block.parsed_text['alphas'][-4:]),
+            month=int(payslip_date_block.parsed_text['alphas'][:-4]),
+            day=1
+        )
+
+    def _get_additional_metadata(self, header_blocks: List[TextBlock]) -> Any:
+        """todo: subunit, יחתש, national_id, bank_details"""
 
     def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
         pass
