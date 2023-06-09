@@ -35,7 +35,6 @@ class IDFPayslipParser(PayslipParser):
         )
 
     def _get_additional_metadata(self, header_blocks: List[TextBlock]) -> Any:
-        """todo: subunit, יחתש, national_id, bank_details"""
         payment_unit_block = header_blocks[2]
         assert payment_unit_block.region_name == 'to'
 
@@ -100,7 +99,8 @@ class IDFPayslipParser(PayslipParser):
             }
         raise NotImplementedError()
 
-    def _parse_monthly_block(self, alphas: str, numbers: str, negate_sums: bool) -> Dict:
+    @staticmethod
+    def _parse_monthly_block(alphas: str, numbers: str, negate_sums: bool) -> Dict:
         """Parses תשלומים שוטפים or ניכויים שוטפים"""
         split_numbers = numbers.split('.')
         if len(split_numbers) == 2:  # only סכום נוכחי

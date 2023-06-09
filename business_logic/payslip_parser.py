@@ -17,6 +17,7 @@ class PayslipParser(abc.ABC):
         self.config = config
 
     def parse_payslip(self, payslip_path: str) -> Payslip:
+        # noinspection PyUnresolvedReferences
         pdf = fitz.open(payslip_path)
         text_blocks = []
         for page in pdf:
