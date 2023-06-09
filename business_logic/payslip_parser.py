@@ -55,7 +55,10 @@ class PayslipParser(abc.ABC):
         )
 
     def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
-        return DataFrame([self._body_block_to_record(block) for block in body_blocks]).dropna(how='all').reset_index()
+        df = DataFrame([self._body_block_to_record(block) for block in body_blocks])
+        df = df.dropna(how='all')
+        df = df.reset_index(drop=True)
+        return df
 
     def _get_region_details(self, bounds: RegionBounds) -> (str, bool):
         for region in self.config.regions:
