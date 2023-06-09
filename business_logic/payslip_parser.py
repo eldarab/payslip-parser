@@ -1,6 +1,5 @@
 import abc
-import warnings
-from datetime import datetime
+from datetime import date
 from typing import Any, List, Dict
 
 import fitz
@@ -56,9 +55,7 @@ class PayslipParser(abc.ABC):
         )
 
     def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
-        return DataFrame.from_records(
-            data=[self._body_block_to_record(block) for block in body_blocks]
-        )
+        return DataFrame([self._body_block_to_record(block) for block in body_blocks]).dropna(how='all').reset_index()
 
     def _get_region_details(self, bounds: RegionBounds) -> (str, bool):
         for region in self.config.regions:
@@ -81,7 +78,7 @@ class PayslipParser(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def _get_payslip_date(self, header_blocks: List[TextBlock]) -> datetime:
+    def _get_payslip_date(self, header_blocks: List[TextBlock]) -> date:
         pass
 
     def _get_additional_metadata(self, header_blocks: List[TextBlock]) -> Any:
