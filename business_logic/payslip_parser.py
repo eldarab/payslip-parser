@@ -1,7 +1,7 @@
 import abc
 import warnings
 from datetime import datetime
-from typing import Any, List
+from typing import Any, List, Dict
 
 import fitz
 from pandas import DataFrame
@@ -55,6 +55,19 @@ class PayslipParser(abc.ABC):
             payslip_records=self._get_payslip_records(body_blocks)
         )
 
+    def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
+        return DataFrame.from_records(
+            data=[self._body_block_to_record(block) for block in body_blocks]
+        )
+
+    def _get_region_details(self, bounds: RegionBounds) -> (str, bool):
+        for region in self.config.regions:
+            if bounds.x0 > region.bounds.x0 and \
+                    bounds.y0 > region.bounds.y0 and \
+                    bounds.x1 < region.bounds.x1 and \
+                    bounds.y1 < region.bounds.y1:
+                return region.name, region.is_header
+
     @abc.abstractmethod
     def _get_payslip_name(self, payslip_path: str) -> str:
         pass
@@ -75,18 +88,10 @@ class PayslipParser(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
-        pass
-
-    @abc.abstractmethod
     def _instantiate_text_block(self, block_id: int, region_bounds: RegionBounds, region_name: str, is_header: bool,
                                 text: str) -> TextBlock:
         pass
 
-    def _get_region_details(self, bounds: RegionBounds) -> (str, bool):
-        for region in self.config.regions:
-            if bounds.x0 > region.bounds.x0 and \
-                    bounds.y0 > region.bounds.y0 and \
-                    bounds.x1 < region.bounds.x1 and \
-                    bounds.y1 < region.bounds.y1:
-                return region.name, region.is_header
+    @abc.abstractmethod
+    def _body_block_to_record(self, block: TextBlock) -> Dict:
+        pass
