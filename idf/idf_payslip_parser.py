@@ -10,7 +10,7 @@ from idf.idf_text_block import IDFTextBlock
 
 class IDFPayslipParser(PayslipParser):
     def _get_payslip_name(self, payslip_path: str) -> str:
-        filename = payslip_path.split('/')[-1].split('.')[0]
+        filename = payslip_path.split('/')[-1].split('\\')[-1].split('.')[0]
         month = filename[8:-5] if len(filename[8:-5]) == 2 else '0' + filename[8:-5]  # add leading zero to month
         payslip_name = filename[:7] + '__' + filename[-5:-1] + '-' + month
         return payslip_name
@@ -86,6 +86,7 @@ class IDFPayslipParser(PayslipParser):
             return self._parse_differences(alphas, numbers, negate_total=True)
 
     def _parse_raw_data(self, alphas: str, numbers: str) -> Dict:
+        # TODO improve this function
         if alphas.startswith('רגיל') or alphas.startswith('חובה'):
             start_date = date(
                 day=int(numbers[:2]),
@@ -97,7 +98,22 @@ class IDFPayslipParser(PayslipParser):
                 'ערך הנתון': alphas[:4],
                 'ת. תחילה': start_date,
             }
-        raise NotImplementedError()
+
+        if alphas.startswith('דחית שרות החובה'):
+            start_date = date(
+                day=int(numbers[:2]),
+                month=int(numbers[2:4]),
+                year=int(f'{self.config.century_prefix}{numbers[4:]}')
+            )
+            return {
+                'שם הנתון': alphas[14:],
+                'ערך הנתון': alphas[:14],
+                'ת. תחילה': start_date,
+            }
+
+        return {
+            'unknown': f'{alphas}{numbers}',
+        }
 
     @staticmethod
     def _parse_monthly_block(alphas: str, numbers: str, negate_sums: bool) -> Dict:
@@ -124,8 +140,8 @@ class IDFPayslipParser(PayslipParser):
 
     def _parse_differences(self, alphas: str, numbers: str, negate_total: bool) -> Dict:
         pattern = '(?P<from_DD>[0-9]{2})(?P<from_MM>[0-9]{2})(?P<from_YY>[0-9]{2})' \
-                     '(?P<to_DD>[0-9]{2})(?P<to_MM>[0-9]{2})(?P<to_YY>[0-9]{2})' \
-                     '(?P<shekels>[0-9]{1,5}).(?P<agorot>[0-9]{2})'
+                  '(?P<to_DD>[0-9]{2})(?P<to_MM>[0-9]{2})(?P<to_YY>[0-9]{2})' \
+                  '(?P<shekels>[0-9]{1,5}).(?P<agorot>[0-9]{2})'
         m = re.match(pattern, numbers)
         if m:
             from_date = date(
