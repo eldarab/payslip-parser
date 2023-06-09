@@ -1,11 +1,11 @@
-from datetime import datetime
+from datetime import date
 from typing import Any
 
 from pandas import DataFrame
 
 
 class Payslip:
-    def __init__(self, payslip_name: str, payslip_date: datetime, worker_name: str, worker_id: str,
+    def __init__(self, payslip_name: str, payslip_date: date, worker_name: str, worker_id: str,
                  additional_metadata: Any, payslip_records: DataFrame):
         self.payslip_name = payslip_name
         self.payslip_date = payslip_date
