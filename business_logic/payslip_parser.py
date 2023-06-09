@@ -1,4 +1,5 @@
 import abc
+import warnings
 from datetime import datetime
 from typing import Any, List
 
@@ -17,19 +18,20 @@ class PayslipParser(abc.ABC):
         self.config = config
 
     def parse_payslip(self, payslip_path: str) -> Payslip:
-        with fitz.open(payslip_path) as pdf:
-            text_blocks = []
-            for page in pdf.pages:
-                for pdf_block in page.get_textpage().extractBLOCKS():
-                    region_bounds = RegionBounds(
-                        x0=pdf_block[0],
-                        y0=pdf_block[1],
-                        x1=pdf_block[2],
-                        y1=pdf_block[3]
-                    )
-                    region_name = self._identify_region(region_bounds)
-                    is_header = region_name in self.config.header_regions
-                    text_block = TextBlock(
+        pdf = fitz.open(payslip_path)
+        text_blocks = []
+        for page in pdf:
+            for pdf_block in page.get_textpage().extractBLOCKS():
+                region_bounds = RegionBounds(
+                    x0=pdf_block[0],
+                    y0=pdf_block[1],
+                    x1=pdf_block[2],
+                    y1=pdf_block[3]
+                )
+                region_details = self._get_region_details(region_bounds)
+                if region_details is not None:
+                    region_name, is_header = region_details
+                    text_block = self._instantiate_text_block(
                         block_id=pdf_block[5],
                         region_bounds=region_bounds,
                         region_name=region_name,
@@ -76,11 +78,15 @@ class PayslipParser(abc.ABC):
     def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
         pass
 
-    def _identify_region(self, bounds: RegionBounds) -> str:
+    @abc.abstractmethod
+    def _instantiate_text_block(self, block_id: int, region_bounds: RegionBounds, region_name: str, is_header: bool,
+                                text: str) -> TextBlock:
+        pass
+
+    def _get_region_details(self, bounds: RegionBounds) -> (str, bool):
         for region in self.config.regions:
             if bounds.x0 > region.bounds.x0 and \
                     bounds.y0 > region.bounds.y0 and \
                     bounds.x1 < region.bounds.x1 and \
                     bounds.y1 < region.bounds.y1:
-                return region.name
-        raise RuntimeError('Unidentified region.')
+                return region.name, region.is_header

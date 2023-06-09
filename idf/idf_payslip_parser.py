@@ -5,6 +5,8 @@ from pandas import DataFrame
 
 from business_logic.payslip_parser import PayslipParser
 from business_logic.text_block import TextBlock
+from configuration.config import RegionBounds
+from idf.idf_text_block import IDFTextBlock
 
 
 class IDFPayslipParser(PayslipParser):
@@ -28,8 +30,8 @@ class IDFPayslipParser(PayslipParser):
         payslip_date_block = header_blocks[3]
         assert payslip_date_block.region_name == 'payslip_date'
         return datetime(
-            year=int(payslip_date_block.parsed_text['alphas'][-4:]),
-            month=int(payslip_date_block.parsed_text['alphas'][:-4]),
+            year=int(payslip_date_block.parsed_text['numbers'][-4:]),
+            month=int(payslip_date_block.parsed_text['numbers'][:-4]),
             day=1
         )
 
@@ -38,3 +40,7 @@ class IDFPayslipParser(PayslipParser):
 
     def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
         pass
+
+    def _instantiate_text_block(self, block_id: int, region_bounds: RegionBounds, region_name: str, is_header: bool,
+                                text: str) -> TextBlock:
+        return IDFTextBlock(block_id, region_bounds, region_name, is_header, text)
