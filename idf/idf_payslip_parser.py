@@ -71,21 +71,22 @@ class IDFPayslipParser(PayslipParser):
             return {}
 
         if region_name == 'raw_data':
-            return self._parse_raw_data(alphas, numbers)
+            return self._parse_raw_data_region(alphas, numbers)
 
         if region_name == 'monthly_payments':
-            return self._parse_monthly_block(alphas, numbers, negate_sums=False)
+            return self._parse_monthly_regions(alphas, numbers, negate_sums=False)
 
         if region_name == 'monthly_reductions':
-            return self._parse_monthly_block(alphas, numbers, negate_sums=True)
+            return self._parse_monthly_regions(alphas, numbers, negate_sums=True)
 
         if region_name == 'payments_differences':
-            return self._parse_differences(alphas, numbers, negate_total=False)
+            return self._parse_differences_regions(alphas, numbers, negate_total=False)
 
         if region_name == 'reductions_differences':
-            return self._parse_differences(alphas, numbers, negate_total=True)
+            return self._parse_differences_regions(alphas, numbers, negate_total=True)
 
-    def _parse_raw_data(self, alphas: str, numbers: str) -> Dict:
+    def _parse_raw_data_region(self, alphas: str, numbers: str) -> Dict:
+        """Parses נתונים גולמיים"""
         # TODO improve this function
         if alphas.startswith('רגיל') or alphas.startswith('חובה'):
             start_date = date(
@@ -116,7 +117,7 @@ class IDFPayslipParser(PayslipParser):
         }
 
     @staticmethod
-    def _parse_monthly_block(alphas: str, numbers: str, negate_sums: bool) -> Dict:
+    def _parse_monthly_regions(alphas: str, numbers: str, negate_sums: bool) -> Dict:
         """Parses תשלומים שוטפים or ניכויים שוטפים"""
         split_numbers = numbers.split('.')
         if len(split_numbers) == 2:  # only סכום נוכחי
@@ -138,7 +139,8 @@ class IDFPayslipParser(PayslipParser):
             'סכום נוכחי': current_sum,
         }
 
-    def _parse_differences(self, alphas: str, numbers: str, negate_total: bool) -> Dict:
+    def _parse_differences_regions(self, alphas: str, numbers: str, negate_total: bool) -> Dict:
+        """Parses הפרשי תשלומים or הפרשי ניכויים"""
         pattern = '(?P<from_DD>[0-9]{2})(?P<from_MM>[0-9]{2})(?P<from_YY>[0-9]{2})' \
                   '(?P<to_DD>[0-9]{2})(?P<to_MM>[0-9]{2})(?P<to_YY>[0-9]{2})' \
                   '(?P<shekels>[0-9]{1,5}).(?P<agorot>[0-9]{2})'
