@@ -29,7 +29,7 @@ class PayslipParser(abc.ABC):
                     y1=pdf_block[3]
                 )
                 region_details = self._get_region_details(region_bounds)
-                if region_details is not None:  # TODO warn user if region not found - may lead to information loss 
+                if region_details is not None:  # TODO warn user if region not found - may lead to information loss
                     region_name, is_header = region_details
                     text_block = self._instantiate_text_block(
                         block_id=pdf_block[5],

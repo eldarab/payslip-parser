@@ -2,6 +2,7 @@ from business_logic.text_block import TextBlock
 
 
 class IDFTextBlock(TextBlock):
+    # TODO consider implementing more elegantly (stop using dict as returned value)
     def _parse_text(self, raw_text, reverse_alphas=True):
         text = raw_text.strip('\n').replace('\xa0', ' ')
 
