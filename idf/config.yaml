@@ -1,0 +1,92 @@
+regions:
+  - name: to
+    is_header: true
+    bounds:
+      x0: 40
+      y0: 20
+      x1: 340
+      y1: 70
+  - name: payslip_date
+    is_header: true
+    bounds:
+      x0: 110
+      y0: 105
+      x1: 180
+      y1: 125
+  - name: personal_data
+    is_header: true
+    bounds:
+      x0: 10
+      y0: 145
+      x1: 145
+      y1: 200
+  - name: bank_details
+    is_header: true
+    bounds:
+      x0: 10
+      y0: 205
+      x1: 145
+      y1: 260
+  - name: raw_data
+    is_header: false
+    bounds:
+      x0: 150
+      y0: 140
+      x1: 430
+      y1: 250
+  - name: monthly_payments
+    is_header: false
+    bounds:
+      x0: 220
+      y0: 280
+      x1: 430
+      y1: 390
+  - name: monthly_reductions
+    is_header: false
+    bounds:
+      x0: 10
+      y0: 280
+      x1: 220
+      y1: 390
+  - name: net_monthly_payment
+    is_header: false
+    bounds:
+      x0: 10
+      y0: 385
+      x1: 60
+      y1: 410
+  - name: payments_differences
+    is_header: false
+    bounds:
+      x0: 220
+      y0: 420
+      x1: 430
+      y1: 535
+  - name: reductions_differences
+    is_header: false
+    bounds:
+      x0: 10
+      y0: 420
+      x1: 220
+      y1: 535
+  - name: net_differences
+    is_header: false
+    bounds:
+      x0: 10
+      y0: 530
+      x1: 60
+      y1: 555
+  - name: total_transfer_to_bank
+    is_header: false
+    bounds:
+      x0: 10
+      y0: 695
+      x1: 70
+      y1: 715
+regular_expressions:
+  six_digit_date: "(?P<DD>[0-9]{2})(?P<MM>[0-9]{2})(?P<YY>[0-9]{2})"
+  payment_amount: "(?P<shekels>[0-9]{1,5}).(?P<agorot>[0-9]{2})"
+  differences: "
+  (?P<from_DD>[0-9]{2})(?P<from_MM>[0-9]{2})(?P<from_YY>[0-9]{2})
+  (?P<to_DD>[0-9]{2})(?P<to_MM>[0-9]{2})(?P<to_YY>[0-9]{2})(?P<shekels>[0-9]{1,5}).(?P<agorot>[0-9]{2})"
+is_rtl: True

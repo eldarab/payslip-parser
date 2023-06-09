@@ -76,11 +76,11 @@ class PayslipParser(abc.ABC):
     def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
         pass
 
-    def _identify_region(self, region_bounds: RegionBounds) -> str:
-        for region_name, region in self.config.regions.items():
-            if region_bounds.x0 > region.x0 and \
-                    region_bounds.y0 > region.y0 and \
-                    region_bounds.x1 < region.x1 and \
-                    region_bounds.y1 < region.y1:
-                return region_name
+    def _identify_region(self, bounds: RegionBounds) -> str:
+        for region in self.config.regions:
+            if bounds.x0 > region.bounds.x0 and \
+                    bounds.y0 > region.bounds.y0 and \
+                    bounds.x1 < region.bounds.x1 and \
+                    bounds.y1 < region.bounds.y1:
+                return region.name
         raise RuntimeError('Unidentified region.')

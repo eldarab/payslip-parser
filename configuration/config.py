@@ -10,8 +10,13 @@ class RegionBounds(BaseModel):
     y1: float
 
 
+class Region(BaseModel):
+    name: str
+    is_header: bool
+    bounds = RegionBounds
+
+
 class PayslipsParserConfig(BaseModel):
-    regions: Dict[str, RegionBounds]
+    regions: List[Region]
     regular_expressions: Dict[str, AnyStr]
     is_rtl_payslip: bool
-    header_regions: List[str]
