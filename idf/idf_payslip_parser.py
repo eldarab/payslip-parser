@@ -37,6 +37,28 @@ class IDFPayslipParser(PayslipParser):
 
     def _get_additional_metadata(self, header_blocks: List[TextBlock]) -> Any:
         """todo: subunit, יחתש, national_id, bank_details"""
+        payment_unit_block = header_blocks[2]
+        assert payment_unit_block.region_name == 'to'
+
+        national_id_block = header_blocks[5]
+        assert national_id_block.region_name == 'personal_data'
+
+        bank_name_block = header_blocks[6]
+        account_details_block = header_blocks[7]
+        assert bank_name_block.region_name == account_details_block.region_name == 'bank_details'
+
+        return {
+            'payment_unit': payment_unit_block.parsed_text['numbers'],  # יחתש
+            'national_id': national_id_block.parsed_text['numbers'][:9],  # remove יחתש suffix, if exists
+            'bank_details': {
+                'bank_name': bank_name_block.parsed_text['alphas'],
+                'branch_code': bank_name_block.parsed_text['numbers'],
+                'branch_name': account_details_block.parsed_text['alphas'],
+                'account_number': account_details_block.parsed_text['numbers']
+            }
+        }
+
+
 
     def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
         pass
