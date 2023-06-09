@@ -56,7 +56,12 @@ class PayslipParser(abc.ABC):
         )
 
     def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
-        df = DataFrame([self._body_block_to_record(block) for block in body_blocks])
+        records = []
+        for block in body_blocks:
+            record = self._body_block_to_record(block)
+            if record:
+                records.append(record)
+        df = DataFrame(records)
         df = df.dropna(how='all')
         df = df.reset_index(drop=True)
         return df
