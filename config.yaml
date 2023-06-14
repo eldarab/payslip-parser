@@ -91,12 +91,6 @@ regions:
       y0: 740
       x1: 700
       y1: 1000
-regular_expressions:
-  six_digit_date: "(?P<DD>[0-9]{2})(?P<MM>[0-9]{2})(?P<YY>[0-9]{2})"
-  payment_amount: "(?P<shekels>[0-9]{1,5}).(?P<agorot>[0-9]{2})"
-  differences: "
-  (?P<from_DD>[0-9]{2})(?P<from_MM>[0-9]{2})(?P<from_YY>[0-9]{2})
-  (?P<to_DD>[0-9]{2})(?P<to_MM>[0-9]{2})(?P<to_YY>[0-9]{2})(?P<shekels>[0-9]{1,5}).(?P<agorot>[0-9]{2})"
 rtl_payslip: true
 century_prefix: 20
 pages_to_ignore:

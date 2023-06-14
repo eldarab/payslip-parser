@@ -19,7 +19,6 @@ class Region(BaseModel):
 
 class PayslipsParserConfig(BaseModel):
     regions: List[Region]
-    regular_expressions: Dict[str, AnyStr]
     rtl_payslip: bool
     century_prefix: int
     pages_to_ignore: Optional[List[int]]
