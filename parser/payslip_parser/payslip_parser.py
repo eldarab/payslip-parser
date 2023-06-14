@@ -5,8 +5,8 @@ from typing import Any, List, Dict
 import fitz
 from pandas import DataFrame
 
-from business_logic.payslip import Payslip
-from business_logic.text_block import TextBlock
+from parser.payslip.payslip import Payslip
+from parser.text_block.text_block import TextBlock
 from configuration.config import PayslipsParserConfig, RegionBounds
 
 

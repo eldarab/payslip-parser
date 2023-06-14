@@ -1,4 +1,4 @@
-from business_logic.text_block import TextBlock
+from parser.text_block.text_block import TextBlock
 
 
 class IDFTextBlock(TextBlock):

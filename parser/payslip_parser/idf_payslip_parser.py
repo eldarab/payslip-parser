@@ -2,10 +2,10 @@ import re
 from datetime import date
 from typing import List, Dict, Any
 
-from business_logic.payslip_parser import PayslipParser
-from business_logic.text_block import TextBlock
+from parser.payslip_parser.payslip_parser import PayslipParser
+from parser.text_block.text_block import TextBlock
 from configuration.config import RegionBounds
-from idf.idf_text_block import IDFTextBlock
+from parser.text_block.idf_text_block import IDFTextBlock
 
 
 class IDFPayslipParser(PayslipParser):

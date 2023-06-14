@@ -6,8 +6,8 @@ from typing import List
 import pandas as pd
 from pandas import DataFrame
 
-from business_logic.payslip import Payslip
-from business_logic.payslip_parser import PayslipParser
+from parser.payslip.payslip import Payslip
+from parser.payslip_parser.payslip_parser import PayslipParser
 
 
 class PayslipDirectoryParser(abc.ABC):
