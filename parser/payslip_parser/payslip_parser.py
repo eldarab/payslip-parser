@@ -20,7 +20,9 @@ class PayslipParser(abc.ABC):
         # noinspection PyUnresolvedReferences
         pdf = fitz.open(payslip_path)
         text_blocks = []
-        for page in pdf:
+        for page_idx, page in enumerate(pdf):
+            if self.config.pages_to_ignore is not None and page_idx in self.config.pages_to_ignore:
+                continue
             for pdf_block in page.get_textpage().extractBLOCKS():
                 region_bounds = RegionBounds(
                     x0=pdf_block[0],
@@ -29,7 +31,7 @@ class PayslipParser(abc.ABC):
                     y1=pdf_block[3]
                 )
                 region_details = self._get_region_details(region_bounds)
-                if region_details is not None:  # TODO warn user if region not found - may lead to information loss
+                if region_details is not None:
                     region_name, is_header = region_details
                     text_block = self._instantiate_text_block(
                         block_id=pdf_block[5],
@@ -72,7 +74,11 @@ class PayslipParser(abc.ABC):
                     bounds.y0 > region.bounds.y0 and \
                     bounds.x1 < region.bounds.x1 and \
                     bounds.y1 < region.bounds.y1:
-                return region.name, region.is_header
+                if region.is_ignore_region:
+                    return None
+                else:
+                    return region.name, region.is_header
+        raise RuntimeError(f'Unidentified region: {bounds}')
 
     @abc.abstractmethod
     def _get_payslip_name(self, payslip_path: str) -> str:

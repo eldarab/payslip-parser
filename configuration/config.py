@@ -1,6 +1,6 @@
-from typing import Dict, AnyStr, List
+from typing import Dict, AnyStr, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class RegionBounds(BaseModel):
@@ -13,6 +13,7 @@ class RegionBounds(BaseModel):
 class Region(BaseModel):
     name: str
     is_header: bool
+    is_ignore_region: Optional[bool]
     bounds: RegionBounds
 
 
@@ -21,3 +22,4 @@ class PayslipsParserConfig(BaseModel):
     regular_expressions: Dict[str, AnyStr]
     rtl_payslip: bool
     century_prefix: int
+    pages_to_ignore: Optional[List[int]]
