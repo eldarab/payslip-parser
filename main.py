@@ -16,8 +16,8 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--payslip_path', type=str,
-                        default='G:/My Drive/Personal/Finance/Paychecks/IDF/86901611520231.pdf')
-    parser.add_argument('--directory_path', type=str, default='G:/My Drive/Personal/Finance/Paychecks/IDF')
+                        default='I:/My Drive/Personal/Finance/Paychecks/IDF/86901611520231.pdf')
+    parser.add_argument('--directory_path', type=str, default='I:/My Drive/Personal/Finance/Paychecks/IDF')
     parser.add_argument('--config_path', type=str, default='./idf/config.yaml')
     main_args = parser.parse_args()
 
