@@ -67,6 +67,15 @@ class IDFPayslipParser(PayslipParser):
         alphas = block.parsed_text['alphas']
         numbers = block.parsed_text['numbers']
 
+        if region_name == 'net_monthly_payment':
+            return {'שכר חודשי נטו': float(numbers)}
+
+        if region_name == 'net_differences':
+            return {'הפרשים נטו': float(numbers)}
+
+        if region_name == 'total_transfer_to_bank':
+            return {'סהכ העברה לבנק': float(numbers)}
+
         if alphas == '':
             return {}
 
