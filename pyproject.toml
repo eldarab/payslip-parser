@@ -2,15 +2,15 @@
 name = "payslip-parser"
 version = "0.1.4"
 description = "Parse your payslips from PDFs to pandas dataframes."
+authors = ["Your Name <your@email.com>"]
 license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-PyMuPDF = ">=1.22.3"
+PyMuPDF = "~1.22"
 pandas = "*"
 pathlib = "*"
-yaml = "*"
 pyyaml = "*"
 pydantic = "*"
 
