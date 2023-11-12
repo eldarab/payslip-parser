@@ -8,6 +8,10 @@ setup(
     packages=[''],
     license='MIT',
     install_requires=[
-        ''
+        'pandas',
+        'pathlib',
+        'yaml',
+        'pyyaml',
+        'fitz>=1.22.3'
     ],
 )
