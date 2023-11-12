@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('--payslip_path', type=str,
                         default='H:/My Drive/Personal/Finance/Paychecks/IDF/86901611520231.pdf')
     parser.add_argument('--directory_path', type=str, default='H:/My Drive/Personal/Finance/Paychecks/IDF')
-    parser.add_argument('--config_path', type=str, default='./config.yaml')
+    parser.add_argument('--config_path', type=str, default='./payslip_parser/configuration/idf_payslip_config.yaml')
     main_args = parser.parse_args()
 
     main(main_args)
