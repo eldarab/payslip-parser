@@ -17,6 +17,14 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[dependencies]
+pandas = "*"
+pathlib = "*"
+yaml = "*"
+pyyaml = "*"
+pydantic = "*"
+fitz = ">=1.22.3"
+
 [project.urls]
 "Homepage" = "https://github.com/eldarab/payslip-parser"
 "Bug Tracker" = "https://github.com/eldarab/payslip-parser/issues"
