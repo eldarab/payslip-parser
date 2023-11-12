@@ -1,6 +1,6 @@
 import yaml
 
-from configuration.config import PayslipsParserConfig
+from payslip_parser.configuration.config import PayslipsParserConfig
 
 
 def load_config(config_path: str) -> PayslipsParserConfig:

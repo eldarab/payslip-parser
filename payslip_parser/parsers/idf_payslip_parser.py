@@ -2,30 +2,30 @@ import re
 from datetime import date
 from typing import List, Dict, Any
 
-from parser.payslip_parser.payslip_parser import PayslipParser
-from parser.text_block.text_block import TextBlock
-from configuration.config import RegionBounds
-from parser.text_block.idf_text_block import IDFTextBlock
+from payslip_parser.parsers.base_payslip_parser import BasePayslipParser
+from payslip_parser.text_blocks.base_text_block import BaseTextBlock
+from payslip_parser.configuration.config import RegionBounds
+from payslip_parser.text_blocks.idf_text_block import IDFTextBlock
 
 
-class IDFPayslipParser(PayslipParser):
+class IDFPayslipParser(BasePayslipParser):
     def _get_payslip_name(self, payslip_path: str) -> str:
         filename = payslip_path.split('/')[-1].split('\\')[-1].split('.')[0]
         month = filename[8:-5] if len(filename[8:-5]) == 2 else '0' + filename[8:-5]  # add leading zero to month
         payslip_name = filename[:7] + '__' + filename[-5:-1] + '-' + month
         return payslip_name
 
-    def _get_worker_id(self, header_blocks: List[TextBlock]) -> str:
+    def _get_worker_id(self, header_blocks: List[BaseTextBlock]) -> str:
         idf_personal_number_block = header_blocks[4]
         assert idf_personal_number_block.region_name == 'personal_data'
         return idf_personal_number_block.parsed_text['numbers']
 
-    def _get_worker_name(self, header_blocks: List[TextBlock]) -> str:
+    def _get_worker_name(self, header_blocks: List[BaseTextBlock]) -> str:
         worker_name_block = header_blocks[0]
         assert worker_name_block.region_name == 'to'
         return worker_name_block.parsed_text['alphas'][4:]  # get rid of מ.א. prefix
 
-    def _get_payslip_date(self, header_blocks: List[TextBlock]) -> date:
+    def _get_payslip_date(self, header_blocks: List[BaseTextBlock]) -> date:
         payslip_date_block = header_blocks[3]
         assert payslip_date_block.region_name == 'payslip_date'
         return date(
@@ -34,7 +34,7 @@ class IDFPayslipParser(PayslipParser):
             day=1
         )
 
-    def _get_additional_metadata(self, header_blocks: List[TextBlock]) -> Any:
+    def _get_additional_metadata(self, header_blocks: List[BaseTextBlock]) -> Any:
         payment_unit_block = header_blocks[2]
         assert payment_unit_block.region_name == 'to'
 
@@ -57,7 +57,7 @@ class IDFPayslipParser(PayslipParser):
         }
 
     def _instantiate_text_block(self, block_id: int, region_bounds: RegionBounds, region_name: str, is_header: bool,
-                                text: str) -> TextBlock:
+                                text: str) -> BaseTextBlock:
         return IDFTextBlock(block_id, region_bounds, region_name, is_header, text)
 
     def _body_block_to_record(self, block: IDFTextBlock) -> Dict:
