@@ -9,10 +9,12 @@ setup(
     packages=[''],
     license='MIT',
     install_requires=[
+        'setuptools',
         'pandas',
         'pathlib',
         'yaml',
         'pyyaml',
-        'fitz>=1.22.3'
+        'pydantic',
+        'fitz>=1.22.3',
     ],
 )
