@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "payslip_parser"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
     { name = "Eldar Abraham", email = "author@example.com" },
 ]
