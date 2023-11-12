@@ -4,11 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "payslip_parser"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     { name = "Eldar Abraham", email = "author@example.com" },
 ]
-description = "Parse your payslips from PDF to pandas dataframes."
+description = "Parse your payslips from PDFs to pandas dataframes."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [

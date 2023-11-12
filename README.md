@@ -1,5 +1,2 @@
-# Tlush Parser
-Parses the monthly payslip from IDF.
-
-# Author
-Eldar Abraham
+# Payslip Parser
+Parse your payslips from PDFs to pandas dataframes.
