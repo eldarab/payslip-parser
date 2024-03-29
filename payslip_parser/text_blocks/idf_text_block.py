@@ -1,9 +1,15 @@
-from parser.text_block.text_block import TextBlock
+from typing import Dict
+
+from payslip_parser.text_blocks import BaseTextBlock
 
 
-class IDFTextBlock(TextBlock):
+class IDFTextBlock(BaseTextBlock):
     # TODO consider implementing more elegantly (stop using dict as returned value)
-    def _parse_text(self, raw_text, reverse_alphas=True):
+    def _parse_text(
+            self,
+            raw_text,
+            reverse_alphas=True
+    ) -> Dict[str, str]:
         text = raw_text.strip('\n').replace('\xa0', ' ')
 
         alphas = ''
@@ -16,4 +22,7 @@ class IDFTextBlock(TextBlock):
             else:
                 alphas = char + alphas if reverse_alphas else alphas + char
 
-        return {'alphas': alphas, 'numbers': numbers}
+        return {
+            'alphas': alphas,
+            'numbers': numbers
+        }

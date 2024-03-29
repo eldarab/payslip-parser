@@ -1,6 +1,6 @@
-from typing import Dict, AnyStr, List, Optional
+from typing import List, Optional
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 
 
 class RegionBounds(BaseModel):

@@ -5,8 +5,15 @@ from pandas import DataFrame
 
 
 class Payslip:
-    def __init__(self, payslip_name: str, payslip_date: date, worker_name: str, worker_id: str,
-                 additional_metadata: Any, payslip_records: DataFrame):
+    def __init__(
+            self,
+            payslip_name: str,
+            payslip_date: date,
+            worker_name: str,
+            worker_id: str,
+            additional_metadata: Any,
+            payslip_records: DataFrame
+    ) -> None:
         self.payslip_name = payslip_name
         self.payslip_date = payslip_date
         self.worker_name = worker_name

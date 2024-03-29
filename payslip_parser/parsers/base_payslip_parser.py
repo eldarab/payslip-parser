@@ -5,12 +5,12 @@ from typing import Any, List, Dict
 import fitz
 from pandas import DataFrame
 
-from parser.payslip.payslip import Payslip
-from parser.text_block.text_block import TextBlock
-from configuration.config import PayslipsParserConfig, RegionBounds
+from payslip_parser import Payslip
+from payslip_parser.text_blocks.base_text_block import BaseTextBlock
+from payslip_parser.configuration.config import PayslipsParserConfig, RegionBounds
 
 
-class PayslipParser(abc.ABC):
+class BasePayslipParser(abc.ABC):
     """An ABC for parsing a single payslip"""
 
     def __init__(self, config: PayslipsParserConfig):
@@ -57,7 +57,7 @@ class PayslipParser(abc.ABC):
             payslip_records=self._get_payslip_records(body_blocks)
         )
 
-    def _get_payslip_records(self, body_blocks: List[TextBlock]) -> DataFrame:
+    def _get_payslip_records(self, body_blocks: List[BaseTextBlock]) -> DataFrame:
         records = []
         for block in body_blocks:
             record = self._body_block_to_record(block)
@@ -85,25 +85,25 @@ class PayslipParser(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def _get_worker_id(self, header_blocks: List[TextBlock]) -> str:
+    def _get_worker_id(self, header_blocks: List[BaseTextBlock]) -> str:
         pass
 
     @abc.abstractmethod
-    def _get_worker_name(self, header_blocks: List[TextBlock]) -> str:
+    def _get_worker_name(self, header_blocks: List[BaseTextBlock]) -> str:
         pass
 
     @abc.abstractmethod
-    def _get_payslip_date(self, header_blocks: List[TextBlock]) -> date:
+    def _get_payslip_date(self, header_blocks: List[BaseTextBlock]) -> date:
         pass
 
-    def _get_additional_metadata(self, header_blocks: List[TextBlock]) -> Any:
+    def _get_additional_metadata(self, header_blocks: List[BaseTextBlock]) -> Any:
         pass
 
     @abc.abstractmethod
     def _instantiate_text_block(self, block_id: int, region_bounds: RegionBounds, region_name: str, is_header: bool,
-                                text: str) -> TextBlock:
+                                text: str) -> BaseTextBlock:
         pass
 
     @abc.abstractmethod
-    def _body_block_to_record(self, block: TextBlock) -> Dict:
+    def _body_block_to_record(self, block: BaseTextBlock) -> Dict:
         pass

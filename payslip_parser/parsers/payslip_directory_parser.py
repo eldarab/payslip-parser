@@ -6,14 +6,14 @@ from typing import List
 import pandas as pd
 from pandas import DataFrame
 
-from parser.payslip.payslip import Payslip
-from parser.payslip_parser.payslip_parser import PayslipParser
+from payslip_parser.payslips.payslip import Payslip
+from payslip_parser.parsers.base_payslip_parser import BasePayslipParser
 
 
 class PayslipDirectoryParser(abc.ABC):
     """An ABC for parsing a directory of payslips of the same format"""
 
-    def __init__(self, payslip_parser: PayslipParser):
+    def __init__(self, payslip_parser: BasePayslipParser):
         self.payslip_parser = payslip_parser
 
     def parse_directory(self, path: str) -> List[Payslip]:
