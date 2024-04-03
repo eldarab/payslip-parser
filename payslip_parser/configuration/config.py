@@ -13,7 +13,7 @@ class RegionBounds(BaseModel):
 class Region(BaseModel):
     name: str
     is_header: bool
-    is_ignore_region: Optional[bool]
+    is_ignore_region: Optional[bool] = False
     bounds: RegionBounds
 
 
