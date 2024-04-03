@@ -1,12 +1,14 @@
 import os
+import pathlib
 from typing import List
 
 import pytest
 
 from payslip_parser import load_config, IDFPayslipParser
 
-SOURCE_DIR = "../../payslip_parser"
-EXAMPLE_PAYSLIPS_DIR = "../example_payslips"
+ROOT_PATH = pathlib.Path("C:\\Users\\Eldar-Desktop\\PycharmProjects\\payslip-parser")  # set this to project's root
+SOURCE_DIR = ROOT_PATH / "payslip_parser"
+EXAMPLE_PAYSLIPS_DIR = ROOT_PATH / "example_payslips"
 
 
 @pytest.fixture
