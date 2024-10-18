@@ -1,0 +1,4 @@
+site_name: Payslip Parser
+site_url: https://payslip-parser.org/
+theme:
+  name: material
