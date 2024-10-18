@@ -14,7 +14,7 @@ spec:
         app: documentation-page
     spec:
       containers:
-        - image: de.icr.io/example/documentation_page
+        - image: docker.io/eldarab/payslip-parser-docs
           name: documentation-page
           ports:
             - containerPort: 8080
