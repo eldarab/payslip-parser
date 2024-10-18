@@ -2,3 +2,8 @@ site_name: Payslip Parser
 site_url: https://payslip-parser.org/
 theme:
   name: material
+  features:
+    - navigation.tabs
+nav:
+  - Home: index.md
+  - Another Tab: another_tab.md
