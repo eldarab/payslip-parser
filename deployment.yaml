@@ -43,4 +43,4 @@ spec:
           configMap:
             name: nginx-config
         - name: nginx-pid
-          emptyDir: { }
+          emptyDir: {}
