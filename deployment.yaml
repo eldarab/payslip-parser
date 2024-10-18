@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: documentation-page
-  namespace: documentation
+  namespace: kaki1234-dev
 spec:
   replicas: 1
   selector:
