@@ -1,3 +1,4 @@
 from .payslips import Payslip
-from .payslip_parsers import BasePayslipParser, IDFPayslipParser, PayslipDirectoryParser
+from .directory_parsers import PayslipDirectoryParser
+from .payslip_parsers import BasePayslipParser, IDFPayslipParser
 from .configuration import load_config
