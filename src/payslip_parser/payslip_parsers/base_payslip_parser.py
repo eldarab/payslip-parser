@@ -5,29 +5,53 @@ from typing import Any, List, Dict
 import fitz
 from pandas import DataFrame
 
+from payslip_parser.configuration.config import RegionBounds
 from payslip_parser.payslips import Payslip
 from payslip_parser.text_blocks.base_text_block import BaseTextBlock
-from payslip_parser.configuration.config import PayslipsParserConfig, RegionBounds
 
 
 class BasePayslipParser(abc.ABC):
     """
-    Base class for parsing payslips.
+    Abstract base class for parsing payslip documents.
 
-    This class provides a common interface for parsing payslips from PDF files.
-
-    Args:
-        config (PayslipsParserConfig): Configuration object containing details about the payslip structure and regions.
-
-    Attributes:
-        config (PayslipsParserConfig): Configuration object containing details about the payslip structure and regions.
+    This class provides a foundation for extracting data from PDF payslip files.
+    It organizes the data into header and body blocks and processes them into
+    structured records.
 
     Methods:
         parse_payslip(payslip_path: str) -> Payslip:
-            Parses a payslip from the given PDF file path and returns a Payslip object containing the parsed data.
+            Parses a payslip PDF and returns a `Payslip` object.
     """
 
     def parse_payslip(self, payslip_path: str) -> Payslip:
+        """
+        Parses a payslip PDF file and extracts structured data into a Payslip object.
+
+        :param payslip_path: The file path to the payslip PDF.
+        :type payslip_path: str
+        :return: A Payslip object containing parsed information.
+        :rtype: Payslip
+
+        Workflow:
+            1. Opens the PDF file using `fitz`.
+            2. Iterates through each page and extracts text blocks.
+            3. Identifies relevant regions using `_get_region_details` and
+               instantiates text blocks.
+            4. Separates text blocks into header and body blocks.
+            5. Converts body blocks into structured records using `_get_payslip_records`.
+            6. Populates and returns a `Payslip` object.
+
+        Notes:
+            - Header blocks contain descriptive metadata, such as worker name and ID.
+            - Body blocks contain detailed payslip records, such as salary information.
+
+        :raises RuntimeError: If a region cannot be identified within the defined regions.
+
+        Example:
+            >>> parser = MyPayslipParser()
+            >>> payslip = parser.parse_payslip("example_payslip.pdf")
+        """
+        ...
         # noinspection PyUnresolvedReferences
         pdf = fitz.open(payslip_path)
         text_blocks = []
