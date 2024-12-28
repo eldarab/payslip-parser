@@ -1,10 +1,11 @@
 import abc
 from typing import Union
 
-from configuration.config import RegionBounds
+from payslip_parser.configuration import RegionBounds
 
 
 class BaseTextBlock(abc.ABC):
+    """"""
     def __init__(
             self,
             block_id: int,

@@ -4,6 +4,28 @@ from pydantic import BaseModel
 
 
 class RegionBounds(BaseModel):
+    """
+    Represents the bounds of a region in a payslip.
+
+    Attributes:
+        x0: The x-coordinate of the top-left corner.
+        y0: The y-coordinate of the top-left corner.
+        x1: The x-coordinate of the bottom-right corner.
+        y1: The y-coordinate of the bottom-right corner.
+
+    Examples:
+        Some explanation of what is possible.
+
+        >>> print("hello!")
+        hello!
+
+        Blank lines delimit prose vs. console blocks.
+
+        >>> a = 0
+        >>> a += 1
+        >>> a
+        1
+    """
     x0: float
     y0: float
     x1: float

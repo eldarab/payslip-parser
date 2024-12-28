@@ -17,20 +17,17 @@ class BasePayslipParser(abc.ABC):
     This class provides a foundation for extracting data from PDF payslip files.
     It organizes the data into header and body blocks and processes them into
     structured records.
-
-    Methods:
-        parse_payslip(payslip_path: str) -> Payslip:
-            Parses a payslip PDF and returns a `Payslip` object.
     """
 
     def parse_payslip(self, payslip_path: str) -> Payslip:
         """
         Parses a payslip PDF file and extracts structured data into a Payslip object.
 
-        :param payslip_path: The file path to the payslip PDF.
-        :type payslip_path: str
-        :return: A Payslip object containing parsed information.
-        :rtype: Payslip
+        Parameters:
+            payslip_path: The path to the payslip.
+
+        Returns:
+            A Payslip object containing parsed information.
 
         Workflow:
             1. Opens the PDF file using `fitz`.

@@ -1,6 +1,6 @@
 from typing import Dict
 
-from text_blocks import BaseTextBlock
+from .base_text_block import BaseTextBlock
 
 
 class IDFTextBlock(BaseTextBlock):

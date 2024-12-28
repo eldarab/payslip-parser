@@ -1,5 +1,8 @@
 """Generate the code reference pages and navigation."""
 
+import importlib.util
+import sys
+from inspect import getmembers, isclass
 from pathlib import Path
 
 import mkdocs_gen_files
@@ -9,6 +12,12 @@ mod_symbol = '<code class="doc-symbol doc-symbol-nav doc-symbol-module"></code>'
 
 root = Path(__file__).parent.parent
 src = root / "src"
+sys.path.insert(0, str(src))
+
+
+def snake_to_title(snake_str):
+    return ' '.join(x.title() for x in snake_str.split('_'))
+
 
 for path in sorted(src.rglob("*.py")):
     module_path = path.relative_to(src).with_suffix("")
@@ -24,7 +33,25 @@ for path in sorted(src.rglob("*.py")):
     elif parts[-1].startswith("_"):
         continue
 
-    nav_parts = [f"{mod_symbol} {part}" for part in parts]
+    # Extract class name from the module
+    module_name = ".".join(parts)
+    spec = importlib.util.spec_from_file_location(module_name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    class_name_to_obj = {
+        name: obj for name, obj in getmembers(module) if isclass(obj) and obj.__module__ == module_name
+    }
+    classes = list(class_name_to_obj)
+
+    if classes:
+        class_name = classes[0]  # Assuming one class per module
+        # Convert the class name and module path to CamelCase format
+        camel_case_parts = [snake_to_title(part) for part in parts[1:-1]] + [class_name]
+        nav_parts = camel_case_parts
+    else:
+        continue
+
     nav[tuple(nav_parts)] = doc_path.as_posix()
 
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
