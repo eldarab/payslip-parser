@@ -6,12 +6,38 @@ from typing import List
 import pandas as pd
 from pandas import DataFrame
 
-from payslips.payslip import Payslip
-from parsers.base_payslip_parser import BasePayslipParser
+from payslip_parser.payslips.payslip import Payslip
+from payslip_parser.parsers.base_payslip_parser import BasePayslipParser
 
 
 class PayslipDirectoryParser(abc.ABC):
-    """An ABC for parsing a directory of payslips of the same format"""
+    """
+    This class is responsible for parsing a directory containing payslip PDF files and returning a list of parsed payslips.
+    It also provides a method to convert the parsed payslips into a DataFrame for further analysis.
+
+    Args:
+    payslip_parser (BasePayslipParser): An instance of the BasePayslipParser class, which is responsible for parsing individual payslip PDF files.
+
+    Methods:
+
+    parse_directory(path: str) -> List[Payslip]:
+        Parses a directory containing payslip PDF files and returns a list of parsed payslips.
+
+        Args:
+        path (str): The path to the directory containing the payslip PDF files.
+
+        Returns:
+        List[Payslip]: A list of parsed payslips.
+
+    directory_to_dataframe(path: str) -> DataFrame:
+        Converts the parsed payslips into a DataFrame for further analysis.
+
+        Args:
+        path (str): The path to the directory containing the payslip PDF files.
+
+        Returns:
+        DataFrame: A DataFrame containing the parsed payslip data.
+    """
 
     def __init__(self, payslip_parser: BasePayslipParser):
         self.payslip_parser = payslip_parser

@@ -5,21 +5,27 @@ from typing import Any, List, Dict
 import fitz
 from pandas import DataFrame
 
-from src.payslip_parser import Payslip
-from text_blocks.base_text_block import BaseTextBlock
-from configuration.config import PayslipsParserConfig, RegionBounds
+from payslip_parser.payslips import Payslip
+from payslip_parser.text_blocks.base_text_block import BaseTextBlock
+from payslip_parser.configuration.config import PayslipsParserConfig, RegionBounds
 
 
 class BasePayslipParser(abc.ABC):
-    """An ABC for parsing a single payslip"""
+    """
+    Base class for parsing payslips.
 
-    def __init__(self, config: PayslipsParserConfig):
-        """
-        Initializes the parser with the given configuration.
+    This class provides a common interface for parsing payslips from PDF files.
 
-        :param config: The configuration for parsing the payslip.
-        """
-        self.config = config
+    Args:
+        config (PayslipsParserConfig): Configuration object containing details about the payslip structure and regions.
+
+    Attributes:
+        config (PayslipsParserConfig): Configuration object containing details about the payslip structure and regions.
+
+    Methods:
+        parse_payslip(payslip_path: str) -> Payslip:
+            Parses a payslip from the given PDF file path and returns a Payslip object containing the parsed data.
+    """
 
     def parse_payslip(self, payslip_path: str) -> Payslip:
         # noinspection PyUnresolvedReferences
