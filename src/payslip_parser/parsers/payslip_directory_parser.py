@@ -17,32 +17,18 @@ class PayslipDirectoryParser(abc.ABC):
 
     Args:
     payslip_parser (BasePayslipParser): An instance of the BasePayslipParser class, which is responsible for parsing individual payslip PDF files.
-
-    Methods:
-
-    parse_directory(path: str) -> List[Payslip]:
-        Parses a directory containing payslip PDF files and returns a list of parsed payslips.
-
-        Args:
-        path (str): The path to the directory containing the payslip PDF files.
-
-        Returns:
-        List[Payslip]: A list of parsed payslips.
-
-    directory_to_dataframe(path: str) -> DataFrame:
-        Converts the parsed payslips into a DataFrame for further analysis.
-
-        Args:
-        path (str): The path to the directory containing the payslip PDF files.
-
-        Returns:
-        DataFrame: A DataFrame containing the parsed payslip data.
     """
 
     def __init__(self, payslip_parser: BasePayslipParser):
         self.payslip_parser = payslip_parser
 
     def parse_directory(self, path: str) -> List[Payslip]:
+        """
+        Parses a directory containing payslip PDF files and returns a list of parsed payslips.
+
+        :param path: The path to the directory containing the payslip PDF files.
+        :return: A list of parsed payslips.
+        """
         path = pathlib.Path(path)
         assert path.exists()
         assert path.is_dir()
@@ -51,6 +37,12 @@ class PayslipDirectoryParser(abc.ABC):
         return parsed_payslips
 
     def directory_to_dataframe(self, path: str) -> DataFrame:
+        """
+        Converts the parsed payslips into a DataFrame for further analysis.
+
+        :param path: The path to the directory containing the payslip PDF files.
+        :return: A DataFrame containing the parsed payslip data.
+        """
         parsed_payslips = self.parse_directory(path)
         payslip_dfs = []
         for payslip in parsed_payslips:
