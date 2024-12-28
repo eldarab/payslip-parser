@@ -1,0 +1,25 @@
+site_name: "Payslip Parser"
+watch: [ mkdocs.yml, README.md, src/payslip_parser, scripts/ ]
+
+theme:
+  name: "material"
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          default_signature: true
+          show_source: true
+          paths: [ "src" ]
+  - autorefs
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_nav.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+
+nav:
+  - Home: README.md
+  - API Reference: reference/
+
