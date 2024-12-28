@@ -7,7 +7,7 @@ import pandas as pd
 from pandas import DataFrame
 
 from payslip_parser.payslips.payslip import Payslip
-from payslip_parser.parsers.base_payslip_parser import BasePayslipParser
+from payslip_parser.payslip_parsers.base_payslip_parser import BasePayslipParser
 
 
 class PayslipDirectoryParser(abc.ABC):

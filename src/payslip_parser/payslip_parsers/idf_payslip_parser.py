@@ -2,7 +2,7 @@ import re
 from datetime import date
 from typing import List, Dict, Any
 
-from payslip_parser.parsers.base_payslip_parser import BasePayslipParser
+from payslip_parser.payslip_parsers.base_payslip_parser import BasePayslipParser
 from payslip_parser.text_blocks.base_text_block import BaseTextBlock
 from payslip_parser.configuration.config import RegionBounds
 from payslip_parser.text_blocks.idf_text_block import IDFTextBlock
