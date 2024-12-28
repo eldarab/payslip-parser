@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: documentation-page
+  namespace: kaki1234-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: documentation-page
+  template:
+    metadata:
+      labels:
+        app: documentation-page
+    spec:
+      containers:
+        - image: docker.io/eldarab/payslip-parser-docs
+          name: documentation-page
+          ports:
+            - containerPort: 8080
+          # This config is necessary to comply to Openshift security constrains
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+            runAsNonRoot: true
+          # Explicitly adding all the volumeMounts is necessary because the pod
+          # doesn't run as root. So it can't create these volumes itself
+          volumeMounts:
+            - mountPath: /var/cache/nginx
+              name: nginx-cache
+            - mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+              name: nginx-config
+            - mountPath: /var/run
+              name: nginx-pid
+      volumes:
+        - name: nginx-cache
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+        - name: nginx-pid
+          emptyDir: {}

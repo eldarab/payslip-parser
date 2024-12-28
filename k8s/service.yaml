@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: doc-service
+  namespace: kaki1234-dev
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
