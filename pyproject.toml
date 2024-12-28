@@ -1,9 +1,12 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "payslip-parser"
 version = "0.1.4"
 description = "Parse your payslips from PDFs to pandas dataframes."
-authors = ["Your Name <your@email.com>"]
-license = "MIT"
+authors = ["Eldar Abraham <eldar.abraham@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -14,7 +17,3 @@ pathlib = "*"
 pyyaml = "*"
 pydantic = "*"
 
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

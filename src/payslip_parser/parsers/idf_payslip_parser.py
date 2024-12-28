@@ -2,13 +2,15 @@ import re
 from datetime import date
 from typing import List, Dict, Any
 
-from payslip_parser.parsers.base_payslip_parser import BasePayslipParser
-from payslip_parser.text_blocks.base_text_block import BaseTextBlock
-from payslip_parser.configuration.config import RegionBounds
-from payslip_parser.text_blocks.idf_text_block import IDFTextBlock
+from parsers.base_payslip_parser import BasePayslipParser
+from text_blocks.base_text_block import BaseTextBlock
+from configuration.config import RegionBounds
+from text_blocks.idf_text_block import IDFTextBlock
 
 
 class IDFPayslipParser(BasePayslipParser):
+    """Nigger payslip parser"""
+
     def _get_payslip_name(self, payslip_path: str) -> str:
         filename = payslip_path.split('/')[-1].split('\\')[-1].split('.')[0]
         month = filename[8:-5] if len(filename[8:-5]) == 2 else '0' + filename[8:-5]  # add leading zero to month

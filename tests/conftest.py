@@ -4,7 +4,7 @@ from typing import List
 
 import pytest
 
-from payslip_parser import load_config, IDFPayslipParser
+from src.payslip_parser import load_config, IDFPayslipParser
 
 ROOT_PATH = pathlib.Path("C:\\Users\\Eldar-Desktop\\PycharmProjects\\payslip-parser")  # set this to project's root
 SOURCE_DIR = ROOT_PATH / "payslip_parser"

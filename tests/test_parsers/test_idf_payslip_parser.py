@@ -1,4 +1,4 @@
-from payslip_parser import IDFPayslipParser
+from src.payslip_parser import IDFPayslipParser
 
 
 def test_idf_payslip_parser(idf_payslip_parser: IDFPayslipParser, idf_payslip_from_2023_path) -> None:

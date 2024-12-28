@@ -5,15 +5,20 @@ from typing import Any, List, Dict
 import fitz
 from pandas import DataFrame
 
-from payslip_parser import Payslip
-from payslip_parser.text_blocks.base_text_block import BaseTextBlock
-from payslip_parser.configuration.config import PayslipsParserConfig, RegionBounds
+from src.payslip_parser import Payslip
+from text_blocks.base_text_block import BaseTextBlock
+from configuration.config import PayslipsParserConfig, RegionBounds
 
 
 class BasePayslipParser(abc.ABC):
     """An ABC for parsing a single payslip"""
 
     def __init__(self, config: PayslipsParserConfig):
+        """
+        Initializes the parser with the given configuration.
+
+        :param config: The configuration for parsing the payslip.
+        """
         self.config = config
 
     def parse_payslip(self, payslip_path: str) -> Payslip:

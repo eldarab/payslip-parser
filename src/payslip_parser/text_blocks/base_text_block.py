@@ -1,7 +1,7 @@
 import abc
 from typing import Union
 
-from payslip_parser.configuration.config import RegionBounds
+from configuration.config import RegionBounds
 
 
 class BaseTextBlock(abc.ABC):

@@ -1,6 +1,6 @@
 from typing import Dict
 
-from payslip_parser.text_blocks import BaseTextBlock
+from text_blocks import BaseTextBlock
 
 
 class IDFTextBlock(BaseTextBlock):
